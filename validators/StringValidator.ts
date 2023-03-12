@@ -1,10 +1,11 @@
 import { isNil } from "../utils/isNil";
+import { BaseValidator } from "./types/types";
 
 type ValidationError = string
 
 type ValidationFunction = () => boolean;
 
-export class StringValidation {
+export class StringValidation extends BaseValidator<string> {
     private schema: ValidationFunction[] = [];
     private errors: ValidationError[] = [];
     private value: any
