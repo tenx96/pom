@@ -1,0 +1,10 @@
+{
+  "testRegex": "((\\.|/*.)(spec))\\.ts?$",
+  "moduleFileExtensions": [
+    "ts",
+    "js",
+    "json",
+    "node"
+  ],
+  "preset" : "ts-jest"
+}

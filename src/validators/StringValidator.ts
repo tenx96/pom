@@ -48,7 +48,7 @@ export class StringValidation extends BaseValidator<string> {
     public required(): this {
         this.schema.push(() => {
             const input = this.value
-            if (input === "") {
+            if (isNil(input) || input === "") {
                 this.errors.push("Field is required");
                 return false;
             }
