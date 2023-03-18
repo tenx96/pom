@@ -1,8 +1,6 @@
-import {StringValidation,NumberValidation,BooleanValidation} from "./validators"
-const validator = new BooleanValidation().isFalse()
+import pom from "./validators";
 
-const valNum = validator.validate("True")
-console.log("VALUE ", valNum)
-console.log("VALUE TYPe ", typeof valNum)
+const schema = pom.number().required().min(10).max(20)
 
- 
+
+console.log(schema.validate("1"))

@@ -1,4 +1,3 @@
-import { isNil } from "../utils/isNil";
 import { BaseValidator, ValidationError } from "./types/types";
 
 export type ObjectShape = {
@@ -9,11 +8,27 @@ export class ObjectValidator extends BaseValidator<any> {
   private objectShape: ObjectShape;
   private value: any;
 
-  shape(shape: ObjectShape) {
+  constructor(shape: ObjectShape) {
+    super();
     this.objectShape = shape;
   }
 
-  public validate(value: any) {}
+  public validate(value: any) {
+    this.value = value;
+    try {
+      Object.keys(value).forEach((key) => {
+        const validator = this.objectShape[key];
+        if (validator) {
+          const result = validator.validate(value[key]);
+          this.value[key] = result;
+        }
+      });
+
+      return this.value;
+    } catch (err) {
+      throw err
+    }
+  }
 
   public getErrors(): ValidationError[] {
     return this.errors;
