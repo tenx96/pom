@@ -1,7 +1,6 @@
 import { isNil } from "../utils/isNil";
+import PomValidationError, { ValidationError } from "./PomValidationError";
 import { BaseValidator } from "./types/types";
-
-type ValidationError = string;
 
 type ValidationFunction = () => boolean;
 
@@ -21,7 +20,11 @@ export class StringValidation extends BaseValidator<string> {
           this.value = input.toString();
           return true;
         } else {
-          this.errors.push("Input must be a valid string");
+          this.errors.push({
+            message: "Input must be a valid string",
+            fnName: "isString",
+            value: input,
+          });
           return false;
         }
       } else {
@@ -36,7 +39,11 @@ export class StringValidation extends BaseValidator<string> {
     this.schema.push(() => {
       const input = this.value;
       if (input && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) {
-        this.errors.push("Invalid email format");
+        this.errors.push({
+          fnName: "email",
+          message: "Input must be a valid email",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -48,7 +55,11 @@ export class StringValidation extends BaseValidator<string> {
     this.schema.push(() => {
       const input = this.value;
       if (isNil(input) || input === "") {
-        this.errors.push("Field is required");
+        this.errors.push({
+          fnName: "required",
+          message: "string is required",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -60,7 +71,11 @@ export class StringValidation extends BaseValidator<string> {
     this.schema.push(() => {
       const input = this.value;
       if (input && input.length < length) {
-        this.errors.push(`Field must have at least ${length} characters`);
+        this.errors.push({
+          message: `string must have at least ${length} characters`,
+          fnName: "min",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -72,7 +87,11 @@ export class StringValidation extends BaseValidator<string> {
     this.schema.push(() => {
       const input = this.value;
       if (input && input.length > length) {
-        this.errors.push(`Field must have at most ${length} characters`);
+        this.errors.push({
+          message: `string must have at most ${length} characters`,
+          fnName: "max",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -80,13 +99,15 @@ export class StringValidation extends BaseValidator<string> {
     return this;
   }
 
-  public regex(pattern: RegExp, message: string): this {
+  public regex(pattern: RegExp, message?: string): this {
     this.schema.push(() => {
       const input = this.value;
       if (!pattern.test(input)) {
-        this.errors.push(
-          message || `Field must match the regex ${pattern.source}`
-        );
+        this.errors.push({
+          message: message || `string must match the regex ${pattern.source}`,
+          fnName: "regex",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -102,7 +123,7 @@ export class StringValidation extends BaseValidator<string> {
     if (isValid) {
       return this.value;
     }
-    throw new Error(JSON.stringify(this.getErrors()));
+    throw new PomValidationError(this.getErrors());
   }
 
   public getErrors(): ValidationError[] {

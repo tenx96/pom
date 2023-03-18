@@ -1,9 +1,6 @@
 import { isNil } from "../utils/isNil";
-import { BaseValidator } from "./types/types";
-
-type ValidationError = string;
-
-type ValidationFunction = () => boolean;
+import { ValidationError } from "./PomValidationError";
+import { BaseValidator, ValidationFunction } from "./types/types";
 
 export class NumberValidation extends BaseValidator<number> {
   private schema: ValidationFunction[] = [];
@@ -17,7 +14,11 @@ export class NumberValidation extends BaseValidator<number> {
       if (!isNil(input)) {
         if (typeof input === "number" && !isNaN(input)) {
           if (!Number.isFinite(input)) {
-            this.errors.push("Infinity cannot be validated");
+            this.errors.push({
+              message: "Infinity cannot be validated",
+              fnName: "isNumber",
+              value: input,
+            });
             return false;
           }
           return true;
@@ -27,11 +28,19 @@ export class NumberValidation extends BaseValidator<number> {
             this.value = parsed;
             return true;
           } else {
-            this.errors.push("Input must be a valid number");
+            this.errors.push({
+              fnName: "isNumber",
+              message: "Unable to cast string to number",
+              value: input,
+            });
             return false;
           }
         } else {
-          this.errors.push("Input must be a valid number");
+          this.errors.push({
+            fnName: "isNumber",
+            message: "Input must be a valid number",
+            value: input,
+          });
           return false;
         }
       } else {
@@ -46,7 +55,11 @@ export class NumberValidation extends BaseValidator<number> {
     this.schema.push(() => {
       const input = this.value;
       if (isNil(input)) {
-        this.errors.push("Field is required");
+        this.errors.push({
+          message: "Field is required",
+          fnName: "required",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -58,9 +71,11 @@ export class NumberValidation extends BaseValidator<number> {
     this.schema.push(() => {
       const input = this.value;
       if (!isNil(input) && input < minValue) {
-        this.errors.push(
-          `Number must be greater than or equal to ${minValue}, got ${input}`
-        );
+        this.errors.push({
+          message: `Number must be greater than or equal to ${minValue}, got ${input}`,
+          fnName: "min",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -72,9 +87,11 @@ export class NumberValidation extends BaseValidator<number> {
     this.schema.push(() => {
       const input = this.value;
       if (!isNil(input) && input > maxValue) {
-        this.errors.push(
-          `Number must be less than or equal to ${maxValue}, got ${input}`
-        );
+        this.errors.push({
+          message: `Number must be less than or equal to ${maxValue}, got ${input}`,
+          fnName: "max",
+          value: input,
+        });
         return false;
       }
       return true;
@@ -86,9 +103,11 @@ export class NumberValidation extends BaseValidator<number> {
     this.schema.push(() => {
       const input = this.value;
       if (!isNil(input) && input !== equalValue) {
-        this.errors.push(
-          `Number must be equal to ${equalValue} , got ${input}`
-        );
+        this.errors.push({
+          message: `Number must be equal to ${equalValue} , got ${input}`,
+          fnName: "equal",
+          value: input,
+        });
         return false;
       }
       return true;

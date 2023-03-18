@@ -1,11 +1,11 @@
 import { isNil } from "../utils/isNil";
-import { BaseValidator, ValidationError } from "./types/types";
+import PomValidationError, { ValidationError } from "./PomValidationError";
+import { BaseValidator } from "./types/types";
 
 export type ObjectShape = {
   [key in string]: BaseValidator;
 };
 export class ObjectValidator extends BaseValidator<any> {
-  private _errors: ValidationError[] = [];
   private _objectShape: ObjectShape;
   private _value: any;
   private _required: boolean = false;
@@ -18,13 +18,23 @@ export class ObjectValidator extends BaseValidator<any> {
   private isObject(val: any) {
     if (val) {
       if (typeof val !== "object") {
-        this._errors.push("Value is not an object");
-        throw new Error("Value is not an object");
+        throw new PomValidationError([
+          {
+            message: "Value is not an object",
+            fnName: "isObject",
+            value: val,
+          },
+        ]);
       }
 
       if (Array.isArray(val)) {
-        this._errors.push("Array is not a valid object");
-        throw new Error("Array is not a valid obect");
+        throw new PomValidationError([
+          {
+            message: "value is not a valid object",
+            fnName: "isObject",
+            value: val,
+          },
+        ]);
       }
       return this;
     }
@@ -38,8 +48,13 @@ export class ObjectValidator extends BaseValidator<any> {
   private validateRequired(value: any) {
     if (this._required) {
       if (isNil(value)) {
-        this._errors.push("Value is required");
-        throw new Error("Value is required");
+        throw new PomValidationError([
+          {
+            message: "Value is required",
+            fnName: "validateRequired",
+            value: value,
+          },
+        ]);
       }
       return true;
     } else {
@@ -65,9 +80,5 @@ export class ObjectValidator extends BaseValidator<any> {
     } catch (err) {
       throw err;
     }
-  }
-
-  public getErrors(): ValidationError[] {
-    return this._errors;
   }
 }

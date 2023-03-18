@@ -1,8 +1,8 @@
 import { isNil } from "../utils/isNil";
-import { BaseValidator, ValidationError } from "./types/types";
+import PomValidationError, { ValidationError } from "./PomValidationError";
+import { BaseValidator } from "./types/types";
 
 export class ArrayValiator extends BaseValidator<any> {
-  private _errors: ValidationError[] = [];
   private _each?: BaseValidator;
   private _value: any[];
   private _required: boolean = false;
@@ -17,8 +17,13 @@ export class ArrayValiator extends BaseValidator<any> {
     if (valueToValidate) {
       // validate only if value is not null or undefined. null case to be handled by required validator
       if (!Array.isArray(valueToValidate)) {
-        this._errors.push("Value is not an array");
-        throw new Error("Value is not an array");
+        throw new PomValidationError([
+          {
+            message: "Value is not an array",
+            fnName: "isArray",
+            value: valueToValidate,
+          },
+        ]);
       }
     }
   }
@@ -32,21 +37,37 @@ export class ArrayValiator extends BaseValidator<any> {
     if (this._required) {
       if (isNil(val)) {
         // value is null or undefined
-        this._errors.push("Value is required");
-        throw new Error("Value is required");
+        throw new PomValidationError([
+          {
+            message: "Value is required",
+            fnName: "isRequired",
+            value: val,
+          },
+        ]);
       } else {
         // value is defined, validate if length of array is greater than 0
         if (Array.isArray(val)) {
           // is a valid array, check if length is greater than 0
           if (val.length === 0) {
-            this._errors.push("Array must not be empty");
-            throw new Error("Array must not be empty");
+            throw new PomValidationError([
+              {
+                message: "Array must not be empty",
+                fnName: "isRequired",
+                value: val,
+              },
+            ]);
           }
           // is valid retrn true
           return true;
         } else {
           // is not a valid array
-          throw new Error("Invalid argument, expected array");
+          throw new PomValidationError([
+            {
+              message: "Invalid argument, expected array",
+              fnName: "isRequired",
+              value: val,
+            },
+          ]);
         }
       }
     } else {
@@ -68,9 +89,5 @@ export class ArrayValiator extends BaseValidator<any> {
       }
     }
     return this._value;
-  }
-
-  public getErrors(): ValidationError[] {
-    return this._errors;
   }
 }
