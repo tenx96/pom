@@ -16,6 +16,10 @@ export class NumberValidation extends BaseValidator<number> {
       const input = this.value;
       if (!isNil(input)) {
         if (typeof input === "number" && !isNaN(input)) {
+          if (!Number.isFinite(input)) {
+            this.errors.push("Infinity cannot be validated");
+            return false;
+          }
           return true;
         } else if (typeof input === "string") {
           const parsed = parseInt(input);

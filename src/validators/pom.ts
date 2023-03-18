@@ -13,5 +13,5 @@ export const pom = {
   number: () => new NumberValidation(),
   boolean: () => new BooleanValidation(),
   object: (shape: ObjectShape) => new ObjectValidator(shape),
-  array: (each: BaseValidator) => new ArrayValiator(each),
+  array: (each?: BaseValidator) => new ArrayValiator(each),
 };
