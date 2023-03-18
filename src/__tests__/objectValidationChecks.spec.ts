@@ -28,10 +28,12 @@ describe("numberValidationChecks", () => {
   });
 
   it("checks if an object has field email and password", () => {
-    const schema = pom.object({
-      email: pom.string().email(),
-      password: pom.string().min(5),
-    });
+    const schema = pom
+      .object({
+        email: pom.string().email().required(),
+        password: pom.string().min(5).required(),
+      })
+      .required();
     expect(() => schema.validate({})).toThrowError();
     expect(() => schema.validate({ email: "abc" })).toThrowError();
     expect(
@@ -143,5 +145,13 @@ describe("numberValidationChecks", () => {
         })
       )
     ).toThrowError();
+  });
+
+  it("checks empty object is required , should pass if non null", () => {
+    const schema = pom.object({}).required();
+    expect(() => schema.validate(undefined)).toThrowError();
+    expect(() => schema.validate(null)).toThrowError();
+    expect(() => schema.validate(NaN)).toThrowError();
+    expect(() => schema.validate({})).not.toThrowError();
   });
 });

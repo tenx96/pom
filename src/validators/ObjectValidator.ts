@@ -37,7 +37,7 @@ export class ObjectValidator extends BaseValidator<any> {
 
   private validateRequired(value: any) {
     if (this._required) {
-      if (isNil(value) || Object.keys(value).length === 0) {
+      if (isNil(value)) {
         this._errors.push("Value is required");
         throw new Error("Value is required");
       }
