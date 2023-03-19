@@ -1,4 +1,5 @@
-import pom from "../validators";
+import pom from "../../validators";
+import PomValidationError from "../../validators/PomValidationError";
 describe("stringValidationChecks", () => {
   it("should throw when null or undefined in case REQUIRED string", () => {
     const schema = pom.string().required();
@@ -62,5 +63,84 @@ describe("stringValidationChecks", () => {
   it("should validate email only when defined", () => {
     const schema = pom.string().email();
     expect(() => schema.validate(undefined)).not.toThrowError();
+  });
+
+  it("should validate a regex", () => {
+    const schema = pom.string().regex(/^[a-z]+$/);
+    expect(schema.validate("abc")).toEqual("abc");
+    expect(() => schema.validate("123123")).toThrowError();
+    expect(() => schema.validate(undefined)).not.toThrowError();
+  });
+
+  it("conditional validation should work if string includes a validate min 5", () => {
+    const schema = pom
+      .string()
+      .required()
+      .when({
+        is: (val: any) => val.includes("a"),
+        then: (updater) => updater.min(5),
+      });
+    expect(() => schema.validate("a123")).toThrowError();
+    expect(() => schema.validate("c123")).not.toThrowError();
+  });
+
+  it("conditional validation should work if string includes a validate min 5 otherwise min 3", () => {
+    const schema = pom
+      .string()
+      .required()
+      .when({
+        is: (val: any) => val.includes("a"),
+        then: (updater) => updater.min(5),
+        otherwise: (updater) => updater.max(8).min(3),
+      });
+    expect(() => schema.validate("a123")).toThrowError();
+    expect(() => schema.validate("a12345")).not.toThrowError();
+    expect(() => schema.validate("83")).toThrowError();
+    expect(() => schema.validate("123456789")).toThrowError();
+  });
+
+  it("add custom validations", () => {
+    const schema = pom
+      .string()
+      .required()
+      .custom((val) => {
+        if (val.includes("ab")) {
+          return true;
+        }
+        return false;
+      }, "abIncude");
+
+    expect(() => schema.validate("a123")).toThrowError();
+    expect(() => schema.validate("ab123")).not.toThrowError();
+  });
+
+  it("custom and normal validation should work together, custom is valid if string includes ab", () => {
+    const schema = pom
+      .string()
+      .required()
+      .min(4)
+      .custom((val) => {
+        if (val.includes("ab")) {
+          return true;
+        }
+        return false;
+      }, "abIncude");
+
+    expect(() => schema.validate("a123")).toThrowError();
+    expect(() => schema.validate("ab1")).toThrowError();
+    expect(() => schema.validate("ab1234")).not.toThrowError();
+  });
+
+  it("custom email must include aa and be an email", () => {
+    const schema = pom
+      .string()
+      .required()
+      .email()
+      .custom((val) => {
+        return val.includes("aa");
+      }, "aaInclude");
+
+    expect(() => schema.validate("a123")).toThrowError();
+    expect(schema.validate("aa@email.com")).toBe("aa@email.com");
   });
 });

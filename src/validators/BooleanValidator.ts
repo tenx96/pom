@@ -1,5 +1,5 @@
 import { isNil } from "../utils/isNil";
-import { BaseValidator } from "./types/types";
+import { BaseValidator } from "./base/BaseValidator";
 
 type ValidationError = string
 

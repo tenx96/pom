@@ -1,6 +1,6 @@
 import { isNil } from "../utils/isNil";
 import PomValidationError, { ValidationError } from "./PomValidationError";
-import { BaseValidator } from "./types/types";
+import { BaseValidator } from "./base/BaseValidator";
 
 export class ArrayValiator extends BaseValidator<any> {
   private _each?: BaseValidator;

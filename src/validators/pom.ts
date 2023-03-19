@@ -6,10 +6,10 @@ import {
   ArrayValiator,
   ObjectShape,
 } from ".";
-import { BaseValidator } from "./types/types";
+import { BaseValidator } from "./base/BaseValidator";
 
 export const pom = {
-  string: () => new StringValidation(),
+  string: (options?: {name : string}) => new StringValidation(options),
   number: () => new NumberValidation(),
   boolean: () => new BooleanValidation(),
   object: (shape: ObjectShape) => new ObjectValidator(shape),

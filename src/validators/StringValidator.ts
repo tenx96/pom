@@ -1,132 +1,184 @@
+import { generateRandomString } from "../utils/generateRandomString";
 import { isNil } from "../utils/isNil";
 import PomValidationError, { ValidationError } from "./PomValidationError";
-import { BaseValidator } from "./types/types";
+import { BaseValidator, ValidationFunction } from "./base/BaseValidator";
+import { PrimitiveValidator } from "./base/PrimitiveValidator";
+// string validation fn names
+export type StringValidationFn = "max" | "min" | "required" | "email" | "regex";
 
-type ValidationFunction = () => boolean;
+// string validation schema updater, this is used to update the validation schema dynamically using when
+export type StringSchemaUpdater = {
+  max: (max: number) => StringSchemaUpdater;
+  min: (min: number) => StringSchemaUpdater;
+  required: (required?: boolean, message?: string) => StringSchemaUpdater;
+  email: () => StringSchemaUpdater;
+  regex: (pattern: RegExp, message?: string) => StringSchemaUpdater;
+};
 
-export class StringValidation extends BaseValidator<string> {
-  private schema: ValidationFunction[] = [];
-  private errors: ValidationError[] = [];
-  private value: any;
-
-  /** this is a private method as we dont need to expose it. The intention is to have this check enabled as the first check of this class so we insert this rule at the beginning of the schema */
-  private isString(): this {
-    this.schema.splice(0, 0, () => {
-      const input = this.value;
-      if (!isNil(input)) {
-        if (typeof input === "string") {
-          return true;
-        } else if (typeof input === "number") {
-          this.value = input.toString();
-          return true;
-        } else {
-          this.errors.push({
+export class StringValidation extends PrimitiveValidator<
+  StringValidationFn,
+  StringSchemaUpdater,
+  string
+> {
+  // casts a number to string and check for a valid string, thows an error if the input is not a valid string
+  _isValidType(): this {
+    const input = this._value;
+    if (!isNil(input)) {
+      if (typeof input === "string") {
+        // if input is a string then we can safely continue
+        return this;
+      } else if (typeof input === "number") {
+        // try to cast a number to string first
+        this._value = input.toString();
+        return this;
+      } else {
+        throw new PomValidationError([
+          {
             message: "Input must be a valid string",
             fnName: "isString",
             value: input,
+          },
+        ]);
+      }
+    }
+    // if value is nullable ignore check , this should be handled by required fn
+    return this;
+  }
+
+  private _email =
+    (message?: string): ValidationFunction =>
+    (value) => {
+      if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        this._errors.push({
+          fnName: "email",
+          message: message || "Input must be a valid email",
+          value: value,
+          inputName: this.name,
+        });
+        return false;
+      }
+      return true;
+    };
+
+  private _required =
+    (required?: boolean, message?: string): ValidationFunction =>
+    (value) => {
+      const isRequired = required ?? true;
+      if (!isRequired) {
+        // not required so return true
+        return true;
+      } else {
+        if (isNil(value) || value === "") {
+          this._errors.push({
+            fnName: "required",
+            message: message || "string is required",
+            value: value,
+            inputName: this.name,
           });
           return false;
         }
-      } else {
-        // if value is nullable ignore check , this should be handled by required fn
         return true;
       }
-    });
-    return this;
-  }
+    };
 
-  public email(): this {
-    this.schema.push(() => {
-      const input = this.value;
-      if (input && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) {
-        this.errors.push({
-          fnName: "email",
-          message: "Input must be a valid email",
-          value: input,
-        });
-        return false;
-      }
-      return true;
-    });
-    return this;
-  }
-
-  public required(): this {
-    this.schema.push(() => {
-      const input = this.value;
-      if (isNil(input) || input === "") {
-        this.errors.push({
-          fnName: "required",
-          message: "string is required",
-          value: input,
-        });
-        return false;
-      }
-      return true;
-    });
-    return this;
-  }
-
-  public min(length: number): this {
-    this.schema.push(() => {
-      const input = this.value;
-      if (input && input.length < length) {
-        this.errors.push({
-          message: `string must have at least ${length} characters`,
+  private _min =
+    (min: number, message?: string): ValidationFunction =>
+    (value) => {
+      if (value && value.length < min) {
+        this._errors.push({
+          message: message || `string must have at least ${min} characters`,
           fnName: "min",
-          value: input,
+          value: value,
+          inputName: this.name,
         });
         return false;
       }
       return true;
-    });
+    };
+
+  private _max =
+    (max: number, message?: string): ValidationFunction =>
+    (value) => {
+      if (value && value.length > max) {
+        this._errors.push({
+          message: message || `string must have at most ${max} characters`,
+          fnName: "max",
+          value: value,
+          inputName: this.name,
+        });
+        return false;
+      }
+      return true;
+    };
+  private _regex =
+    (pattern: RegExp, message?: string): ValidationFunction =>
+    (value) => {
+      if (!pattern.test(value)) {
+        this._errors.push({
+          message: message || `string must match the regex ${pattern.source}`,
+          fnName: "regex",
+          value: value,
+          inputName: this.name,
+        });
+        return false;
+      }
+      return true;
+    };
+  public email(message?: string): this {
+    this._validationSchema.email = this._email(message);
     return this;
   }
-
-  public max(length: number): this {
-    this.schema.push(() => {
-      const input = this.value;
-      if (input && input.length > length) {
-        this.errors.push({
-          message: `string must have at most ${length} characters`,
-          fnName: "max",
-          value: input,
-        });
-        return false;
-      }
-      return true;
-    });
+  public required(req?: boolean, message?: string): this {
+    this._validationSchema.required = this._required(req, message);
+    return this;
+  }
+  public min(length: number, message?: string): this {
+    this._validationSchema.min = this._min(length, message);
+    return this;
+  }
+  public max(max: number, message?: string): this {
+    this._validationSchema.max = this._max(max, message);
     return this;
   }
 
   public regex(pattern: RegExp, message?: string): this {
-    this.schema.push(() => {
-      const input = this.value;
-      if (!pattern.test(input)) {
-        this.errors.push({
-          message: message || `string must match the regex ${pattern.source}`,
-          fnName: "regex",
-          value: input,
-        });
-        return false;
-      }
-      return true;
-    });
+    this._validationSchema.regex = this._regex(pattern, message);
     return this;
   }
 
-  public validate(input: any): string {
-    this.errors = [];
-    this.value = input;
-    this.isString(); // default validation
-    const isValid = this.schema.every((validator) => validator());
-    if (isValid) {
-      return this.value;
-    }
-    throw new PomValidationError(this.getErrors());
+  public getValidators() {
+    return {
+      email: this._email,
+      required: this._required,
+      min: this._min,
+      max: this._max,
+      regex: this._regex,
+    };
   }
 
-  public getErrors(): ValidationError[] {
-    return this.errors;
-  }
+  // schema updater is a function that returns a function that returns a schema updater
+  _schemaUpdater = (): StringSchemaUpdater => {
+    return {
+      max: (max: number, message?: string) => {
+        this.updateDymamicSchema("max", this._max(max, message));
+        return this._schemaUpdater();
+      },
+      min: (min: number, message?: string) => {
+        this._dynamicValidationSchema.min = this._min(min, message);
+        return this._schemaUpdater();
+      },
+      required: (bool?: boolean, message?: string) => {
+        this._dynamicValidationSchema.required = this._required(bool, message);
+        return this._schemaUpdater();
+      },
+      email: (message?: string) => {
+        this._dynamicValidationSchema.email = this._email(message);
+        return this._schemaUpdater();
+      },
+      regex: (pattern: RegExp, message?: string) => {
+        this._dynamicValidationSchema.regex = this._regex(pattern, message);
+        return this._schemaUpdater();
+      },
+    };
+  };
 }
