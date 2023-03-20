@@ -1,157 +1,157 @@
-import pom from "../validators";
-describe("numberValidationChecks", () => {
-  it("checks if the value is an array", () => {
+import pom from '../validators'
+describe('numberValidationChecks', () => {
+  it('checks if the value is an array', () => {
     const schema = pom.object({
-      name: pom.string(),
-    });
-    expect(() => schema.validate([])).toThrowError();
-  });
+      name: pom.string()
+    })
+    expect(() => schema.validate([])).toThrowError()
+  })
 
-  it("checks if null or nullable is passed and object is not required it should pass", () => {
+  it('checks if null or nullable is passed and object is not required it should pass', () => {
     const schema = pom.object({
-      name: pom.string(),
-    });
-    expect(() => schema.validate(undefined)).not.toThrowError();
-    expect(() => schema.validate(null)).not.toThrowError();
-    expect(() => schema.validate(NaN)).not.toThrowError();
-  });
+      name: pom.string()
+    })
+    expect(() => schema.validate(undefined)).not.toThrowError()
+    expect(() => schema.validate(null)).not.toThrowError()
+    expect(() => schema.validate(NaN)).not.toThrowError()
+  })
 
-  it("should throw if schema has requierd but nullables are passed", () => {
+  it('should throw if schema has requierd but nullables are passed', () => {
     const schema = pom
       .object({
-        name: pom.string(),
+        name: pom.string()
       })
-      .required();
-    expect(() => schema.validate(undefined)).toThrowError();
-    expect(() => schema.validate(null)).toThrowError();
-    expect(() => schema.validate(NaN)).toThrowError();
-  });
+      .required()
+    expect(() => schema.validate(undefined)).toThrowError()
+    expect(() => schema.validate(null)).toThrowError()
+    expect(() => schema.validate(NaN)).toThrowError()
+  })
 
-  it("checks if an object has field email and password", () => {
+  it('checks if an object has field email and password', () => {
     const schema = pom
       .object({
         email: pom.string().email().required(),
-        password: pom.string().min(5).required(),
+        password: pom.string().min(5).required()
       })
-      .required();
-    expect(() => schema.validate({})).toThrowError();
-    expect(() => schema.validate({ email: "abc" })).toThrowError();
+      .required()
+    expect(() => schema.validate({})).toThrowError()
+    expect(() => schema.validate({ email: 'abc' })).toThrowError()
     expect(
       schema.validate({
-        email: "you@email.com",
-        password: "verystrongpassword",
+        email: 'you@email.com',
+        password: 'verystrongpassword'
       })
     ).toEqual({
-      email: "you@email.com",
-      password: "verystrongpassword",
-    });
-  });
+      email: 'you@email.com',
+      password: 'verystrongpassword'
+    })
+  })
 
-  it("checks if an object has optional field and a required field", () => {
+  it('checks if an object has optional field and a required field', () => {
     const schema = pom.object({
       address: pom.string(),
-      email: pom.string().required(),
-    });
+      email: pom.string().required()
+    })
     expect(
-      schema.validate({ address: "Delhi", email: "you@email.com" })
-    ).toEqual({ address: "Delhi", email: "you@email.com" });
-    expect(() => schema.validate({ address: "Delhi" })).toThrowError();
+      schema.validate({ address: 'Delhi', email: 'you@email.com' })
+    ).toEqual({ address: 'Delhi', email: 'you@email.com' })
+    expect(() => schema.validate({ address: 'Delhi' })).toThrowError()
 
-    expect(schema.validate({ email: "you@email.com" })).toEqual({
-      email: "you@email.com",
-    });
-  });
+    expect(schema.validate({ email: 'you@email.com' })).toEqual({
+      email: 'you@email.com'
+    })
+  })
 
-  it("validates an object with nested object", () => {
+  it('validates an object with nested object', () => {
     const schema = pom
       .object({
         address: pom
           .object({
             city: pom.string(),
-            state: pom.string(),
+            state: pom.string()
           })
           .required(),
-        email: pom.string().email().required(),
+        email: pom.string().email().required()
       })
-      .required();
+      .required()
     expect(
       schema.validate({
         address: {
-          city: "Delhi",
-          state: "Delhi",
+          city: 'Delhi',
+          state: 'Delhi'
         },
-        email: "you@email.com",
+        email: 'you@email.com'
       })
     ).toStrictEqual({
       address: {
-        city: "Delhi",
-        state: "Delhi",
+        city: 'Delhi',
+        state: 'Delhi'
       },
-      email: "you@email.com",
-    });
+      email: 'you@email.com'
+    })
 
     expect(() =>
       expect(
         schema.validate({
           address: {
-            city: "Delhi",
-            state: "Delhi",
+            city: 'Delhi',
+            state: 'Delhi'
           },
-          email: "you@@email.com",
+          email: 'you@@email.com'
         })
       )
-    ).toThrowError();
+    ).toThrowError()
 
     expect(() =>
       expect(
         schema.validate({
-          email: "you@email.com",
+          email: 'you@email.com'
         })
       )
-    ).toThrowError();
-  });
+    ).toThrowError()
+  })
 
-  it("handles required at a nested level", () => {
+  it('handles required at a nested level', () => {
     const schema = pom
       .object({
         address: pom
           .object({
             city: pom.string().required(),
-            state: pom.string(),
+            state: pom.string()
           })
           .required(),
-        email: pom.string().email().required(),
+        email: pom.string().email().required()
       })
-      .required();
+      .required()
     expect(() =>
       expect(
         schema.validate({
           address: {
-            city: "",
-            state: "Delhi",
+            city: '',
+            state: 'Delhi'
           },
-          email: "you@gmail.com",
+          email: 'you@gmail.com'
         })
       )
-    ).toThrowError();
+    ).toThrowError()
     expect(() =>
       expect(
         schema.validate({
           address: {
-            city: "Email is empty",
-            state: "Delhi",
+            city: 'Email is empty',
+            state: 'Delhi'
           },
-          email: "",
+          email: ''
         })
       )
-    ).toThrowError();
-  });
+    ).toThrowError()
+  })
 
-  it("checks empty object is required , should pass if non null", () => {
-    const schema = pom.object({}).required();
-    expect(() => schema.validate(undefined)).toThrowError();
-    expect(() => schema.validate(null)).toThrowError();
-    expect(() => schema.validate(NaN)).toThrowError();
-    expect(() => schema.validate({})).not.toThrowError();
-  });
-});
+  it('checks empty object is required , should pass if non null', () => {
+    const schema = pom.object({}).required()
+    expect(() => schema.validate(undefined)).toThrowError()
+    expect(() => schema.validate(null)).toThrowError()
+    expect(() => schema.validate(NaN)).toThrowError()
+    expect(() => schema.validate({})).not.toThrowError()
+  })
+})

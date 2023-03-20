@@ -6,7 +6,7 @@
 //   private _updater: { [key in StringUpdaterFns]?: any } = {};
 //   constructor() {
 //     super();
-   
+
 //   }
 
 //   get updater() {
