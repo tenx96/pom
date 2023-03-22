@@ -1,7 +1,7 @@
 import { pom } from './pom'
-export * from './number'
-export * from './string'
-export * from './boolean'
-export * from './object'
-export * from './array'
+export * from './core/number'
+export * from './core/string'
+export * from './core/boolean'
+export * from './core//object'
+export * from './core/array'
 export default pom

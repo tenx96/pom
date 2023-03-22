@@ -1,6 +1,6 @@
-import { isNil } from '../utils/isNil'
-import { BaseValidator } from './base/BaseValidator'
-import PomValidationError from './PomValidationError'
+import { isNil } from '../../utils/isNil'
+import { BaseValidator } from '../base/BaseValidator'
+import PomValidationError from '../PomValidationError'
 
 export class ArrayValiator extends BaseValidator<any> {
   private readonly _each?: BaseValidator

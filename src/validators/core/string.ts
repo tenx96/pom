@@ -1,9 +1,9 @@
-import { castToString } from '../utils/castTo.util'
-import { handleValidationError } from '../utils/handleValidationError'
-import * as stringUtils from '../utils/string.util'
-import { type ValidationFunction } from './base/BaseValidator'
-import { PrimitiveValidator } from './base/PrimitiveValidator'
-import PomValidationError from './PomValidationError'
+import { castToString } from '../../utils/castTo.util'
+import { handleValidationError } from '../../utils/handleValidationError'
+import * as stringUtils from '../../utils/string.util'
+import { type ValidationFunction } from '../base/BaseValidator'
+import { PrimitiveValidator } from '../base/PrimitiveValidator'
+import PomValidationError from '../PomValidationError'
 // string validation fn names
 export type StringValidationFn = 'max' | 'min' | 'required' | 'email' | 'regex'
 
