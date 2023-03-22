@@ -1,19 +1,23 @@
 import { isNil } from './isNil'
 
 export const castToBoolean = (val: any) => {
-  if (isNil(val)) {
-    return false
-  }
+  if (!isNil(val)) {
+    if (typeof val === 'boolean') {
+      return val
+    }
 
-  if (typeof val === 'boolean') {
-    return val
-  }
+    if (
+      val === 'true' ||
+      val === 'false' ||
+      val === 'True' ||
+      val === 'False'
+    ) {
+      return val.toLowerCase() === 'true'
+    }
 
-  if (val === 'true' || val === 'false' || val === 'True' || val === 'False') {
-    return val.toLowerCase() === 'true'
+    throw new Error('Cannot convert value to boolean')
   }
-
-  throw new Error('Cannot convert value to boolean')
+  return val
 }
 
 export const castToNumber = (val: any) => {

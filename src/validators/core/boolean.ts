@@ -1,87 +1,79 @@
-import { isNil } from '../../utils/isNil'
-import { BaseValidator } from '../base/BaseValidator'
+import * as boolUtils from '../../utils/bool.utils'
+import { castToBoolean } from '../../utils/castTo.util'
+import { handleValidationError } from '../../utils/handleValidationError'
+import { PrimitiveValidator } from '../base/PrimitiveValidator'
+import PomValidationError from '../PomValidationError'
 
-type ValidationError = string
+export type BooleanValidationFns = 'isTrue' | 'isFalse' | 'required'
 
-type ValidationFunction = () => boolean
-const VALID_STRINGS = ['True', 'true', 'False', 'false']
+export interface BooleanSchemaUpdater {
+  isTrue: (customMessage?: string) => BooleanSchemaUpdater
+  isFalse: (customMessage?: string) => BooleanSchemaUpdater
+  required: (
+    required?: boolean,
+    customMessage?: string
+  ) => BooleanSchemaUpdater
+}
 
-export class BooleanValidation extends BaseValidator<boolean> {
-  private readonly schema: ValidationFunction[] = []
-  private errors: ValidationError[] = []
-  private value: any
-
+export class BooleanValidation extends PrimitiveValidator<
+BooleanValidationFns,
+any,
+boolean
+> {
   /** this is a private method as we dont need to expose it. The intention is to have this check enabled as the first check of this class so we insert this rule at the beginning of the schema */
-  private isBoolean (): this {
-    this.schema.splice(0, 0, () => {
-      const input = this.value
-      if (!isNil(input)) {
-        if (typeof input === 'boolean') {
-          return true
-        } else if (typeof input === 'string' && VALID_STRINGS.includes(input)) {
-          // validate a string with values defined in VALID_STRINGS
-          this.value = input.toLowerCase() === 'true'
-          return true
-        } else {
-          this.errors.push('Input must be a boolean')
-          return false
-        }
-      } else {
-        // if value is nullable ignore check , this should be handled by required fn
-        return true
+  _schemaUpdater (): BooleanSchemaUpdater {
+    return {
+      isTrue: (customMessage?: string) => {
+        this._dynamicValidationSchema.isTrue = (value) =>
+          handleValidationError(boolUtils.isTrue(value), customMessage)
+        return this._schemaUpdater()
+      },
+      isFalse: (customMessage?: string) => {
+        this._dynamicValidationSchema.isFalse = (value) =>
+          handleValidationError(boolUtils.isFalse(value), customMessage)
+        return this._schemaUpdater()
+      },
+      required: (required?: boolean, customMessage?: string) => {
+        this._dynamicValidationSchema.required = (value) =>
+          handleValidationError(
+            boolUtils.required(value, required),
+            customMessage
+          )
+        return this._schemaUpdater()
       }
-    })
-    return this
-  }
-
-  public isTrue (): this {
-    this.schema.push(() => {
-      const input = this.value
-      if (input !== true) {
-        this.errors.push('Field must be true')
-        return false
-      }
-      return true
-    })
-    return this
-  }
-
-  public isFalse (): this {
-    this.schema.push(() => {
-      const input = this.value
-      if (input !== false) {
-        this.errors.push('Field must be false')
-        return false
-      }
-      return true
-    })
-    return this
-  }
-
-  public required (): this {
-    this.schema.push(() => {
-      const input = this.value
-      if (isNil(input)) {
-        this.errors.push('Field is required')
-        return false
-      }
-      return true
-    })
-    return this
-  }
-
-  public validate (input: any): boolean {
-    this.errors = []
-    this.value = input
-    this.isBoolean() // default validation
-    const isValid = this.schema.every((validator) => validator())
-    if (isValid) {
-      return this.value
     }
-    throw new Error(JSON.stringify(this.getErrors()))
   }
 
-  public getErrors (): ValidationError[] {
-    return this.errors
+  _isValidType (): this {
+    const input = this._value
+    try {
+      const inputDraft = castToBoolean(input)
+      this._value = inputDraft
+    } catch (err: any) {
+      throw new PomValidationError({
+        message: err.message || 'Value is not a boolean',
+        fnName: '_isValidType',
+        value: input
+      })
+    }
+    return this
+  }
+
+  public isTrue (customMessage?: string): this {
+    this._validationSchema.isTrue = (value) =>
+      handleValidationError(boolUtils.isTrue(value), customMessage)
+    return this
+  }
+
+  public isFalse (customMessage?: string): this {
+    this._validationSchema.isFalse = (value) =>
+      handleValidationError(boolUtils.isFalse(value), customMessage)
+    return this
+  }
+
+  public required (required?: boolean, customMessage?: string): this {
+    this._validationSchema.required = (value) =>
+      handleValidationError(boolUtils.required(value, required), customMessage)
+    return this
   }
 }
