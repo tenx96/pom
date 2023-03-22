@@ -1,4 +1,4 @@
-import * as stringUtils from '../stringUtils'
+import * as stringUtils from '../string.util'
 
 describe('stringUtils', () => {
   it('validates a email, returns an error message when error and void when true', () => {

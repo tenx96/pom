@@ -1,4 +1,4 @@
-import * as boolUtils from '../boolUtils'
+import * as boolUtils from '../bool.utils'
 
 describe('boolUtils', () => {
   it('validates a required, returns an error message when error and void when true', () => {

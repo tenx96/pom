@@ -1,7 +1,7 @@
 import { pom } from './pom'
-export * from './NumberValidator'
-export * from './StringValidator'
-export * from './BooleanValidator'
-export * from './ObjectValidator'
-export * from './ArrayValidator'
+export * from './number'
+export * from './string'
+export * from './boolean'
+export * from './object'
+export * from './array'
 export default pom

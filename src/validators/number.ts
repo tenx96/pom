@@ -1,6 +1,6 @@
-import { castToNumber } from '../utils/castUtils'
+import { castToNumber } from '../utils/castTo.util'
 import { handleValidationError } from '../utils/handleValidationError'
-import * as numberUtils from '../utils/numberUtils'
+import * as numberUtils from '../utils/number.util'
 import { type ValidationFunction } from './base/BaseValidator'
 import { PrimitiveValidator, type Updaters } from './base/PrimitiveValidator'
 import PomValidationError from './PomValidationError'

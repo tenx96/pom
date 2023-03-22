@@ -1,5 +1,5 @@
 // validates number util functions
-import * as numberUtils from '../numberUtils'
+import * as numberUtils from '../number.util'
 describe('numberUtils', () => {
   it('validates a max, returns an error message when error and void when true', () => {
     expect(numberUtils.max(2, 3)).toBe('input must have maximum 2 characters')

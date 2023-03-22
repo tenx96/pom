@@ -1,4 +1,4 @@
-import * as castUtils from '../castUtils'
+import * as castUtils from '../castTo.util'
 
 describe('castUtils', () => {
   it('casts a string to a number, returns an error message when error and the value itself when successfully changed to required type', () => {

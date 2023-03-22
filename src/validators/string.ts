@@ -1,6 +1,6 @@
-import { castToString } from '../utils/castUtils'
+import { castToString } from '../utils/castTo.util'
 import { handleValidationError } from '../utils/handleValidationError'
-import * as stringUtils from '../utils/stringUtils'
+import * as stringUtils from '../utils/string.util'
 import { type ValidationFunction } from './base/BaseValidator'
 import { PrimitiveValidator } from './base/PrimitiveValidator'
 import PomValidationError from './PomValidationError'
