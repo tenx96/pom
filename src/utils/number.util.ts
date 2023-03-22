@@ -2,13 +2,13 @@ import { isNil } from './isNil'
 
 export const max = (max: number, value: any) => {
   if (value && value > max) {
-    return `input must have maximum ${max} characters`
+    return `input must be less than or equal to ${max}`
   }
 }
 
 export const min = (min: number, value: any) => {
   if (value && value < min) {
-    return `input must have at least ${min} characters`
+    return `input must be greater than or equal to ${min}`
   }
 }
 

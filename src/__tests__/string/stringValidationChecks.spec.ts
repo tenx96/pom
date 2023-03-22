@@ -33,6 +33,11 @@ describe('stringValidationChecks', () => {
     expect(() => schema.validate('abcd')).toThrowError()
   })
 
+  it('min should fail for empty strings', () => {
+    const schema = pom.string().min(5)
+    expect(() => schema.validate('')).toThrowError()
+  })
+
   it('should convert a number to string and then validate its min length', () => {
     const schema = pom.string().min(5).required()
     expect(() => schema.validate(6)).toThrowError()

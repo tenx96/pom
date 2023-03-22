@@ -5,9 +5,6 @@ export const parseCustomMessage = (
   message?: string,
   name?: string
 ) => {
-  console.log('input', input)
-  console.log('message', message)
-  console.log('name', name)
   let msg = message
   if (msg) {
     msg = msg.replace(/\$value/g, input)

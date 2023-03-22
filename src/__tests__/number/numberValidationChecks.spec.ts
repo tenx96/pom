@@ -1,4 +1,4 @@
-import pom from '../validators'
+import pom from '../../validators'
 describe('numberValidationChecks', () => {
   it('should throw when null or undefined in case REQUIRED number', () => {
     const schema = pom.number().required()

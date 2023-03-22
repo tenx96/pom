@@ -55,4 +55,16 @@ describe('numberValidationChecks', () => {
     expect(() => schema.validate([])).not.toThrowError()
     expect(schema.validate([1, 2, 3])).toEqual([1, 2, 3])
   })
+
+  it('conditional array validation check : if length of array is greater than 2 then min value of each item should be 5 else 2', () => {
+    const array = pom.array(pom.number().min(2)).when({
+      is: (value: any) => value.length > 3,
+      then: () => pom.array(pom.number().min(5))
+    })
+
+    expect(() => array.validate([1, 2, 3])).toThrowError() // 1 will fail as len is less than 3 and min is 2
+    expect(() => array.validate([4, 5, 6, 7, 8])).toThrowError() // 4 will fail as len is greater than 3 and min is 5
+    expect(array.validate([5, 6, 7])).toEqual([5, 6, 7]) // then case
+    expect(array.validate([2, 3])).toEqual([2, 3]) // default case
+  })
 })

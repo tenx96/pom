@@ -1,4 +1,5 @@
 import { generateRandomString } from '../../utils/generateRandomString'
+import { parseCustomMessage } from '../../utils/parseCustomMessage'
 import PomValidationError, {
   type ValidationError
 } from '../PomValidationError'
@@ -95,7 +96,7 @@ export abstract class PrimitiveValidator<
             if (boolOrError) {
               // has errr
               this._pushError({
-                message: boolOrError,
+                message: parseCustomMessage(this._value, boolOrError, this.name) ?? 'Validation failed',
                 fnName: validator.name,
                 value: this._value
               })

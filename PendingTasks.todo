@@ -1,0 +1,19 @@
+use https://marketplace.visualstudio.com/items?itemName=sandy081.todotasks
+
+
+Pending features
+
+Number:
+    ☐ add integer or float validations
+    ☐ add validations for the number of digits before and after the decimal point
+    ☐ trim the number of digits after the decimal point
+    ✔ fix wrong error message in min max fns in number 'input must have maximum 10 characters', @done (3/24/2023, 7:57:56 PM)
+Strings:
+    ☐ trim spaces in string
+
+Object and Array:
+    ☐ add conditional and updater functions as in Primitive validator
+
+Test Cases:
+    ☐ add test cases float checks in integer
+    ☐ conditional validation with custom message

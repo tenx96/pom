@@ -15,7 +15,7 @@ export const required = (value: any, required?: boolean) => {
 }
 
 export const min = (min: number, value: any) => {
-  if (value && value.length < min) {
+  if (!isNil(value) && value.length < min) {
     return `input must have at least ${min} characters`
   }
 }

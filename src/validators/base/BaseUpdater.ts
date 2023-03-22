@@ -1,4 +1,2 @@
 /* eslint-disable */ 
-export abstract class BaseUpdater {
- 
-}
+export type BaseUpdater = {[key in string] : (...args : any) => BaseUpdater }

@@ -2,12 +2,12 @@
 import * as numberUtils from '../number.util'
 describe('numberUtils', () => {
   it('validates a max, returns an error message when error and void when true', () => {
-    expect(numberUtils.max(2, 3)).toBe('input must have maximum 2 characters')
+    expect(numberUtils.max(2, 3)).toBe('input must be less than or equal to 2')
     expect(numberUtils.max(2, 1)).toBeUndefined()
   })
 
   it('validates a min, returns an error message when error and void when true', () => {
-    expect(numberUtils.min(2, 1)).toBe('input must have at least 2 characters')
+    expect(numberUtils.min(2, 1)).toBe('input must be greater than or equal to 2')
     expect(numberUtils.min(2, 3)).toBeUndefined()
   })
 
