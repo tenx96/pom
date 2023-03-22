@@ -76,7 +76,35 @@ export abstract class PrimitiveValidator<
     }).every((validator) => {
       try {
         if (validator != null) {
-          return validator(this._value)
+          const boolOrError = validator(this._value)
+          if (typeof boolOrError === 'boolean') {
+            if (boolOrError) {
+              return true
+            } else {
+              this._pushError({
+                message: 'Custom Validation failed',
+                fnName: validator.name,
+                value: this._value
+              })
+              return false
+            }
+          } else {
+            // this is condition for undefined  or string case
+            // if there is a non empty string then it is an error
+            // else there is no error
+            if (boolOrError) {
+              // has errr
+              this._pushError({
+                message: boolOrError,
+                fnName: validator.name,
+                value: this._value
+              })
+              return false
+            } else {
+              // no error
+              return true
+            }
+          }
         }
         return false
       } catch (err) {

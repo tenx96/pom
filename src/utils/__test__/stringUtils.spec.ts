@@ -2,10 +2,9 @@ import * as stringUtils from '../stringUtils'
 
 describe('stringUtils', () => {
   it('validates a email, returns an error message when error and void when true', () => {
-    expect(stringUtils.email('invalid@text')).toBe(
-      'Input must be a valid email'
-    )
+    expect(stringUtils.email('invalid@text..com')).toBe('input must be a valid email')
     expect(stringUtils.email('user@email.com')).toBeUndefined()
+    expect(stringUtils.email('you@@email.com')).toBe('input must be a valid email')
   })
   it('validates a required, returns an error message when error and void when true', () => {
     expect(stringUtils.required('')).toBe('input is required')

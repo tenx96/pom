@@ -7,13 +7,14 @@ describe('castUtils', () => {
     )
     expect(castUtils.castToNumber(true)).toBe(1)
     expect(castUtils.castToNumber(false)).toBe(0)
-    expect(() => castUtils.castToNumber(undefined)).toThrowError(
+    expect(() => castUtils.castToNumber('333aa')).toThrowError()
+    expect(() => castUtils.castToNumber(undefined)).not.toThrowError(
       'Cannot convert value to number'
     )
-    expect(() => castUtils.castToNumber(NaN)).toThrowError(
+    expect(() => castUtils.castToNumber(NaN)).not.toThrowError(
       'Cannot convert value to number'
     )
-    expect(() => castUtils.castToNumber(null)).toThrowError(
+    expect(() => castUtils.castToNumber(null)).not.toThrowError(
       'Cannot convert value to number'
     )
     expect(() => castUtils.castToNumber({})).toThrowError(
@@ -28,15 +29,9 @@ describe('castUtils', () => {
     expect(castUtils.castToString('')).toBe('')
     expect(castUtils.castToString(true)).toBe('true')
     expect(castUtils.castToString(false)).toBe('false')
-    expect(() => castUtils.castToString(undefined)).toThrowError(
-      'Cannot convert value to string'
-    )
-    expect(() => castUtils.castToString(NaN)).toThrowError(
-      'Cannot convert value to string'
-    )
-    expect(() => castUtils.castToString(null)).toThrowError(
-      'Cannot convert value to string'
-    )
+    expect(() => castUtils.castToString(undefined)).not.toThrowError()
+    expect(() => castUtils.castToString(NaN)).not.toThrowError()
+    expect(() => castUtils.castToString(null)).not.toThrowError()
     expect(() => castUtils.castToString({})).toThrowError(
       'Cannot convert value to string'
     )

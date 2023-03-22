@@ -1,8 +1,9 @@
 import { isNil } from './isNil'
 
+const rEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 export const email = (value: any) => {
-  if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-    return 'Input must be a valid email'
+  if (value && !rEmail.test(value)) {
+    return 'input must be a valid email'
   }
 }
 

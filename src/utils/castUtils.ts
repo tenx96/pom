@@ -19,7 +19,9 @@ export const castToBoolean = (val: any) => {
 export const castToNumber = (val: any) => {
   if (!isNil(val)) {
     if (typeof val === 'number') {
-      return val
+      if (Number.isFinite(val)) {
+        return val
+      }
     } else if (typeof val === 'string' && val !== '') {
       const maybeNan = Number(val)
       if (!Number.isNaN(maybeNan)) {
@@ -28,8 +30,10 @@ export const castToNumber = (val: any) => {
     } else if (typeof val === 'boolean') {
       return val ? 1 : 0
     }
+    throw new Error('Cannot convert value to number')
+  } else {
+    return val
   }
-  throw new Error('Cannot convert value to number')
 }
 
 export const castToString = (val: any) => {
@@ -40,7 +44,10 @@ export const castToString = (val: any) => {
       return val.toString()
     } else if (typeof val === 'boolean') {
       return val.toString()
+    } else {
+      throw new Error('Cannot convert value to string')
     }
+  } else {
+    return val
   }
-  throw new Error('Cannot convert value to string')
 }

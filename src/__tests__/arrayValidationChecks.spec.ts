@@ -17,7 +17,7 @@ describe('numberValidationChecks', () => {
     expect(() => schema.validate({} as any)).toThrowError()
     expect(() => schema.validate([])).not.toThrowError()
     expect(schema.validate([1, 2, '3'])).toEqual([1, 2, 3])
-    expect(schema.validate([1, 2, '333aa'])).toEqual([1, 2, 333])
+    expect(schema.validate([1, 2, '333'])).toEqual([1, 2, 333])
     expect(() => schema.validate([1, 2, 'aa333aa'])).toThrowError()
   })
 

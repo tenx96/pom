@@ -1,4 +1,6 @@
-import { isNil } from '../utils/isNil'
+import { castToString } from '../utils/castUtils'
+import { handleValidationError } from '../utils/handleValidationError'
+import * as stringUtils from '../utils/stringUtils'
 import { type ValidationFunction } from './base/BaseValidator'
 import { PrimitiveValidator } from './base/PrimitiveValidator'
 import PomValidationError from './PomValidationError'
@@ -22,108 +24,40 @@ string
   // casts a number to string and check for a valid string, thows an error if the input is not a valid string
   _isValidType (): this {
     const input = this._value
-    if (!isNil(input)) {
-      if (typeof input === 'string') {
-        // if input is a string then we can safely continue
-        return this
-      } else if (typeof input === 'number') {
-        // try to cast a number to string first
-        this._value = input.toString()
-        return this
-      } else {
-        throw new PomValidationError([
-          {
-            message: 'Input must be a valid string',
-            fnName: 'isString',
-            value: input
-          }
-        ])
-      }
+    try {
+      const validInput = castToString(input)
+      this._value = validInput
+      return this
+    } catch (err) {
+      throw new PomValidationError([
+        {
+          message: 'Input must be a valid string',
+          fnName: 'isString',
+          value: input
+        }
+      ])
     }
-    // if value is nullable ignore check , this should be handled by required fn
-    return this
   }
 
   private readonly _email =
     (message?: string): ValidationFunction =>
-      (value) => {
-        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          this._errors.push({
-            fnName: 'email',
-            message: message ?? 'Input must be a valid email',
-            value,
-            inputName: this.name
-          })
-          return false
-        }
-        return true
-      }
+      (value) => handleValidationError(stringUtils.email(value), message)
 
   private readonly _required =
     (required?: boolean, message?: string): ValidationFunction =>
-      (value) => {
-        const isRequired = required ?? true
-        if (!isRequired) {
-        // not required so return true
-          return true
-        } else {
-          if (isNil(value) || value === '') {
-            this._errors.push({
-              fnName: 'required',
-              message: message ?? 'string is required',
-              value,
-              inputName: this.name
-            })
-            return false
-          }
-          return true
-        }
-      }
+      (value) => handleValidationError(stringUtils.required(value, required), message)
 
   private readonly _min =
     (min: number, message?: string): ValidationFunction =>
-      (value) => {
-        if (value && value.length < min) {
-          this._errors.push({
-            message: message ?? `string must have at least ${min} characters`,
-            fnName: 'min',
-            value,
-            inputName: this.name
-          })
-          return false
-        }
-        return true
-      }
+      (value) => handleValidationError(stringUtils.min(min, value), message)
 
   private readonly _max =
     (max: number, message?: string): ValidationFunction =>
-      (value) => {
-        if (value && value.length > max) {
-          this._errors.push({
-            message: message ?? `string must have at most ${max} characters`,
-            fnName: 'max',
-            value,
-            inputName: this.name
-          })
-          return false
-        }
-        return true
-      }
+      (value) => handleValidationError(stringUtils.max(max, value), message)
 
   private readonly _regex =
     (pattern: RegExp, message?: string): ValidationFunction =>
-      (value) => {
-        if (!pattern.test(value)) {
-          this._errors.push({
-            message: message ?? `string must match the regex ${pattern.source}`,
-            fnName: 'regex',
-            value,
-            inputName: this.name
-          })
-          return false
-        }
-        return true
-      }
+      (value) => handleValidationError(stringUtils.regex(pattern, value), message)
 
   public email (message?: string): this {
     this._validationSchema.email = this._email(message)

@@ -104,9 +104,9 @@ describe('stringValidationChecks', () => {
       .required()
       .custom((val) => {
         if (val.includes('ab')) {
-          return true
+          return ''
         }
-        return false
+        return 'input must include ab'
       }, 'abIncude')
 
     expect(() => schema.validate('a123')).toThrowError()
@@ -120,9 +120,9 @@ describe('stringValidationChecks', () => {
       .min(4)
       .custom((val) => {
         if (val.includes('ab')) {
-          return true
+          return ''
         }
-        return false
+        return 'input must include ab'
       }, 'abIncude')
 
     expect(() => schema.validate('a123')).toThrowError()

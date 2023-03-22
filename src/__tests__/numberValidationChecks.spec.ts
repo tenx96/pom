@@ -25,9 +25,10 @@ describe('numberValidationChecks', () => {
     const schema = pom.number()
     expect(() => schema.validate('abc123')).toThrowError()
   })
-  it('should throw error if a boolean is passed', () => {
+  it('should return 0 or 1  if a boolean is passed', () => {
     const schema = pom.number()
-    expect(() => schema.validate(true)).toThrowError()
+    expect(schema.validate(true)).toBe(1)
+    expect(schema.validate(false)).toBe(0)
   })
   it('should throw error if a function is passed', () => {
     const schema = pom.number()
